@@ -19,6 +19,8 @@ class BorrowerProfile extends Model
         'foto_kk',
         'foto_diri',
         'jenis_simpanan',
+        'tabungan_pokok',
+        'status',
     ];
 
     protected $hidden = [

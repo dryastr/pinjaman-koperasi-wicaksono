@@ -7,11 +7,31 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4 class="card-title">Daftar Pengajuan Pinjaman</h4>
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createLoanModal">
-                            Buat Pengajuan Baru
-                        </button>
+                    <div class="d-flex align-items-start justify-content-between">
+
+                        <div class="d-flex flex-column gap-2 align-items-start">
+                            <h4 class="card-title">Daftar Pengajuan Pinjaman</h4>
+                            @if (!empty($warnings))
+                                <div class="alert alert-warning mt-3 w-100">
+                                    <ul class="mb-0">
+                                        @foreach ($warnings as $warning)
+                                            <li>{{ $warning }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="d-flex gap-2 align-items-center justify-content-end">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#createLoanModal">
+                                Buat Pengajuan Baru
+                            </button>
+                            <a href="{{ route('loan-applications.print') }}" target="_blank"
+                                class="btn btn-outline-primary">
+                                Print Data Pinjaman Aktif
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-content">
@@ -40,7 +60,7 @@
                                                 Minggu
                                             </td>
                                             <td>
-                                                 @if ($loan->sisa_durasi_pinjaman == 0)
+                                                @if ($loan->sisa_durasi_pinjaman == 0)
                                                     <label for="" class="badge bg-success">Lunas</label>
                                                 @else
                                                     {{ $loan->sisa_durasi_pinjaman }} Minggu

@@ -39,39 +39,54 @@ class LoanPaymentController extends Controller
             'catatan' => 'nullable|string|max:500',
         ]);
 
-        DB::transaction(function () use ($request) {
-            $loan = LoanApplication::findOrFail($request->loan_application_id);
+        try {
+            DB::transaction(function () use ($request) {
+                $loan = LoanApplication::findOrFail($request->loan_application_id);
 
-            if ($loan->user_id != $request->user_id) {
-                throw ValidationException::withMessages([
-                    'loan_application_id' => 'Pinjaman ini tidak terkait dengan anggota yang dipilih'
+                if ($loan->user_id != $request->user_id) {
+                    throw ValidationException::withMessages([
+                        'loan_application_id' => 'Pinjaman ini tidak terkait dengan anggota yang dipilih'
+                    ]);
+                }
+
+                if ($loan->sisa_durasi_pinjaman <= 0) {
+                    throw ValidationException::withMessages([
+                        'loan_application_id' => 'Pinjaman ini sudah lunas'
+                    ]);
+                }
+
+                $buktiPath = $request->file('bukti_pembayaran')->store('public/loan_payments');
+
+                LoanPayment::create([
+                    'loan_application_id' => $request->loan_application_id,
+                    'user_id' => $request->user_id,
+                    'jumlah_dibayar' => $request->jumlah_dibayar,
+                    'tanggal_pembayaran' => $request->tanggal_pembayaran,
+                    'metode_pembayaran' => $request->metode_pembayaran,
+                    'bukti_pembayaran' => str_replace('public/', '', $buktiPath),
+                    'catatan' => $request->catatan,
                 ]);
-            }
 
-            if ($loan->sisa_durasi_pinjaman <= 0) {
-                throw ValidationException::withMessages([
-                    'loan_application_id' => 'Pinjaman ini sudah lunas'
-                ]);
-            }
+                $loan->decrement('sisa_durasi_pinjaman');
+            });
 
-            $buktiPath = $request->file('bukti_pembayaran')->store('public/loan_payments');
-
-            LoanPayment::create([
-                'loan_application_id' => $request->loan_application_id,
-                'user_id' => $request->user_id,
-                'jumlah_dibayar' => $request->jumlah_dibayar,
-                'tanggal_pembayaran' => $request->tanggal_pembayaran,
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'bukti_pembayaran' => str_replace('public/', '', $buktiPath),
-                'catatan' => $request->catatan,
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil disimpan.',
+                'redirect' => route('loan-payments.index')
             ]);
-
-            $loan->decrement('sisa_durasi_pinjaman');
-        });
-
-        return redirect()->route('loan-payments.index')
-            ->with('success', 'Pembayaran berhasil disimpan dan sisa durasi pinjaman telah diperbarui.');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan pembayaran: ' . $e->getMessage()
+            ], 500);
+        }
     }
+
+
+        // return redirect()->route('loan-payments.index')
+        //     ->with('success', 'Pembayaran berhasil disimpan dan sisa durasi pinjaman telah diperbarui.');
+    // }
 
     public function update(Request $request, $id)
     {

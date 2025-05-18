@@ -3,27 +3,30 @@
 namespace App\Http\Controllers\supervisor;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\BorrowerProfile;
+use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ManageApprovalUserController extends Controller
 {
     /**
-     * Display a listing of pending users.
+     * Display a listing of pending borrower profiles.
      */
     public function index()
     {
-        $users = User::whereHas('role', function ($query) {
-            $query->where('name', 'user');
-        })
+        $users = BorrowerProfile::with('user')
             ->where('status', 'pending')
+            ->whereHas('user', function ($query) {
+                $query->where('role_id', Role::where('name', 'user')->first()->id);
+            })
             ->get();
 
         return view('supervisor.manage-approval-users.index', compact('users'));
     }
 
     /**
-     * Update the user status.
+     * Update the borrower profile status.
      */
     public function update(Request $request, $id)
     {
@@ -31,36 +34,38 @@ class ManageApprovalUserController extends Controller
             'status' => 'required|in:pending,accepted,rejected'
         ]);
 
-        $user = User::findOrFail($id);
+        $profile = BorrowerProfile::findOrFail($id);
 
-        \Log::info('Updating user status', [
-            'user_id' => $user->id,
-            'old_status' => $user->status,
+        Log::info('Updating borrower profile status', [
+            'borrower_profile_id' => $profile->id,
+            'user_id' => $profile->user_id,
+            'old_status' => $profile->status,
             'new_status' => $request->status,
             'time' => now()
         ]);
 
-        $user->status = $request->status;
-        $user->save();
+        $profile->status = $request->status;
+        $profile->save();
 
-        \Log::info('User status updated', [
-            'user_id' => $user->id,
-            'status' => $user->status,
+        Log::info('Borrower profile status updated', [
+            'borrower_profile_id' => $profile->id,
+            'status' => $profile->status,
             'time' => now()
         ]);
 
         return redirect()->route('manage-approval-users.index')
-            ->with('success', 'Status user berhasil diperbarui.');
+            ->with('success', 'Status profil peminjam berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified user.
+     * Remove the specified borrower profile.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        $user->delete();
+        $profile = BorrowerProfile::findOrFail($id);
+        $profile->delete();
 
         return redirect()->route('manage-approval-users.index')
-            ->with('success', 'User berhasil dihapus.');
+            ->with('success', 'Profil peminjam berhasil dihapus.');
     }
 }

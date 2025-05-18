@@ -10,8 +10,8 @@
                     <div class="d-flex align-items-center justify-content-between">
                         <h4 class="card-title">Daftar Pembayaran Pinjaman</h4>
                         <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                            data-bs-target="#createPaymentModal">
-                            Tambah Pembayaran
+                            data-bs-target="#transactionModal">
+                            Tambah Pembayaran Pinjaman dan Simpanan
                         </button>
                     </div>
                 </div>
@@ -86,73 +86,170 @@
         </div>
     </div>
 
-    <!-- Create Modal -->
-    <div class="modal fade" id="createPaymentModal" tabindex="-1" aria-labelledby="createPaymentModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createPaymentModalLabel">Tambah Pembayaran</h5>
+                    <h5 class="modal-title">Tambah Transaksi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form id="createPaymentForm" method="POST" action="{{ route('loan-payments.store') }}"
-                        enctype="multipart/form-data">
+                    <!-- Form Simpanan -->
+                    <form id="savingForm" class="mb-4 border-bottom pb-4">
                         @csrf
-                        <div class="mb-3">
-                            <label for="user_id" class="form-label">Anggota</label>
-                            <select class="form-select" id="user_id" name="user_id" required onchange="loadUserLoans()">
-                                <option value="">Pilih Anggota</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">
-                                        {{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                        <h6 class="fw-bold">Pembayaran Simpanan</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="createUserId" class="form-label">Anggota</label>
+                                <select class="form-select" id="createUserId" name="user_id" required>
+                                    <option value="">Pilih Anggota</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="createAmount" class="form-label">Jumlah (Rp)</label>
+                                <input type="number" class="form-control" id="createAmount" name="amount" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="loan_application_id" class="form-label">Pinjaman</label>
-                            <select class="form-select" id="loan_application_id" name="loan_application_id" required>
-                                <option value="">Pilih Anggota Terlebih Dahulu</option>
-                            </select>
-                            <small class="text-muted" id="loan_info"></small>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="createType" class="form-label">Jenis Simpanan</label>
+                                <select class="form-select" id="createType" name="type" required>
+                                    <option value="">Pilih Jenis</option>
+                                    <option value="pokok">Pokok</option>
+                                    <option value="wajib">Wajib</option>
+                                    <option value="sukarela">Sukarela</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="createDate" class="form-label">Tanggal</label>
+                                <input type="date" class="form-control" id="createDate" name="date" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="jumlah_dibayar" class="form-label">Jumlah Dibayar (Rp)</label>
-                            <input type="number" class="form-control" id="jumlah_dibayar" name="jumlah_dibayar"
-                                min="1" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tanggal_pembayaran" class="form-label">Tanggal Pembayaran</label>
-                            <input type="date" class="form-control" id="tanggal_pembayaran" name="tanggal_pembayaran"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="metode_pembayaran" class="form-label">Metode Pembayaran</label>
-                            <select class="form-select" id="metode_pembayaran" name="metode_pembayaran" required>
-                                <option value="">Pilih Metode</option>
-                                <option value="tunai">Tunai</option>
-                                <option value="non tunai">Non Tunai</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="bukti_pembayaran" class="form-label">Bukti Pembayaran</label>
-                            <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran"
-                                accept="image/*" required>
-                            <small class="text-muted">Format: JPEG, PNG, JPG (Maks 2MB)</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="catatan" class="form-label">Catatan (Opsional)</label>
-                            <textarea class="form-control" id="catatan" name="catatan" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
                     </form>
+
+                    <!-- Form Pembayaran Pinjaman -->
+                    <form id="paymentForm" class="mb-4 border-bottom pb-4" enctype="multipart/form-data">
+                        @csrf
+                        <h6 class="fw-bold">Pembayaran Pinjaman</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="user_id" class="form-label">Anggota</label>
+                                <select class="form-select" id="user_id" name="user_id" required
+                                    onchange="loadUserLoans()">
+                                    <option value="">Pilih Anggota</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="loan_application_id" class="form-label">Pinjaman</label>
+                                <select class="form-select" id="loan_application_id" name="loan_application_id" required>
+                                    <option value="">Pilih Anggota Terlebih Dahulu</option>
+                                </select>
+                                <small class="text-muted" id="loan_info"></small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="jumlah_dibayar" class="form-label">Jumlah Dibayar (Rp)</label>
+                                <input type="number" class="form-control" id="jumlah_dibayar" name="jumlah_dibayar"
+                                    min="1" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="tanggal_pembayaran" class="form-label">Tanggal Pembayaran</label>
+                                <input type="date" class="form-control" id="tanggal_pembayaran"
+                                    name="tanggal_pembayaran" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="metode_pembayaran" class="form-label">Metode Pembayaran</label>
+                                <select class="form-select" id="metode_pembayaran" name="metode_pembayaran" required>
+                                    <option value="">Pilih Metode</option>
+                                    <option value="tunai">Tunai</option>
+                                    <option value="non tunai">Non Tunai</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="bukti_pembayaran" class="form-label">Bukti Pembayaran</label>
+                                <input type="file" class="form-control" id="bukti_pembayaran" name="bukti_pembayaran"
+                                    accept="image/*" required>
+                                <small class="text-muted">Format: JPEG, PNG, JPG (Maks 2MB)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="catatan" class="form-label">Catatan (Opsional)</label>
+                                <textarea class="form-control" id="catatan" name="catatan" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Form Pendapatan Kantor (New) -->
+                    <form id="incomeForm" enctype="multipart/form-data">
+                        @csrf
+                        <h6 class="fw-bold">Pendapatan Kantor</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="incomeUserId" class="form-label">Penerima</label>
+                                <select class="form-select" id="incomeUserId" name="user_id" required>
+                                    <option value="">Pilih Pengguna</option>
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incomeAmount" class="form-label">Jumlah (Rp)</label>
+                                <input type="number" class="form-control" id="incomeAmount" name="amount" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="incomeDescription" class="form-label">Keterangan</label>
+                                <input type="text" class="form-control" id="incomeDescription" name="description"
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incomePaymentDate" class="form-label">Tanggal Pembayaran</label>
+                                <input type="date" class="form-control" id="incomePaymentDate" name="payment_date"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="incomePaymentMethod" class="form-label">Metode Pembayaran</label>
+                                <select class="form-select" id="incomePaymentMethod" name="payment_method" required>
+                                    <option value="">Pilih Metode</option>
+                                    <option value="tunai">Tunai</option>
+                                    <option value="transfer">Transfer</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="incomeProof" class="form-label">Bukti Pembayaran</label>
+                                <input type="file" class="form-control" id="incomeProof" name="proof"
+                                    accept="image/*" required>
+                                <small class="text-muted">Format: JPEG, PNG, JPG (Maks 2MB)</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="submitAll">Simpan Semua</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -225,7 +322,6 @@
         </div>
     </div>
 
-    <!-- Detail Modal -->
     <div class="modal fade" id="detailPaymentModal" tabindex="-1" aria-labelledby="detailPaymentModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -301,48 +397,6 @@
         }
 
         document.getElementById('tanggal_pembayaran').valueAsDate = new Date();
-
-        function loadUserLoans() {
-            const userId = document.getElementById('user_id').value;
-            const loanSelect = document.getElementById('loan_application_id');
-
-            loanSelect.innerHTML = '<option value="">Memuat Pinjaman...</option>';
-
-            if (!userId) {
-                loanSelect.innerHTML = '<option value="">Pilih Anggota Terlebih Dahulu</option>';
-                return;
-            }
-
-            fetch(`{{ url('get-user-loans') }}/${userId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    loanSelect.innerHTML = '<option value="">Pilih Pinjaman</option>';
-
-                    if (data.length === 0) {
-                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif</option>';
-                        return;
-                    }
-
-                    data.forEach(loan => {
-                        if (loan.sisa_durasi_pinjaman > 0) {
-                            const option = document.createElement('option');
-                            option.value = loan.id;
-                            option.textContent =
-                                `Pinjaman #${loan.id} - ${loan.jenis_pinjaman} (Rp ${new Intl.NumberFormat('id-ID').format(loan.jumlah_pinjaman)}) - Sisa ${loan.sisa_durasi_pinjaman} bulan`;
-                            loanSelect.appendChild(option);
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading loans:', error);
-                    loanSelect.innerHTML = '<option value="">Error loading loans</option>';
-                });
-        }
     </script>
 
     <script>
@@ -423,4 +477,131 @@
             loadEditUserLoans(userId);
         });
     </script>
+    <script>
+        document.getElementById('submitAll').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Memproses...';
+
+            try {
+                const savingForm = document.getElementById('savingForm');
+                const paymentForm = document.getElementById('paymentForm');
+                const incomeForm = document.getElementById('incomeForm');
+
+                const savingData = new FormData(savingForm);
+                const paymentData = new FormData(paymentForm);
+                const incomeData = new FormData(incomeForm);
+
+                const [savingRes, paymentRes, incomeRes] = await Promise.all([
+                    fetch("{{ route('savings.storejson') }}", {
+                        method: 'POST',
+                        body: savingData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    }),
+                    fetch("{{ route('loan-payments.store') }}", {
+                        method: 'POST',
+                        body: paymentData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    }),
+                    fetch("{{ route('office-incomes-json.store') }}", {
+                        method: 'POST',
+                        body: incomeData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                ]);
+
+                const savingIsJson = savingRes.headers.get('content-type')?.includes('application/json');
+                const paymentIsJson = paymentRes.headers.get('content-type')?.includes('application/json');
+                const incomeIsJson = incomeRes.headers.get('content-type')?.includes('application/json');
+
+                if (!savingIsJson || !paymentIsJson || !incomeIsJson) {
+                    throw new Error('Format respons server tidak valid');
+                }
+
+                const [savingResult, paymentResult, incomeResult] = await Promise.all([
+                    savingRes.json(),
+                    paymentRes.json(),
+                    incomeRes.json()
+                ]);
+
+                const errors = [];
+                if (!savingResult.success) errors.push(`Simpanan: ${savingResult.message}`);
+                if (!paymentResult.success) errors.push(`Pinjaman: ${paymentResult.message}`);
+                if (!incomeResult.success) errors.push(`Pendapatan: ${incomeResult.message}`);
+
+                if (errors.length > 0) {
+                    throw new Error(errors.join('\n'));
+                }
+
+                alert('Semua transaksi berhasil disimpan!');
+                window.location.href = savingResult.redirect || "{{ route('loan-payments.index') }}";
+
+            } catch (error) {
+                console.error('Error:', error);
+
+                if (error.message.includes('NetworkError')) {
+                    alert('Koneksi jaringan bermasalah. Silakan coba lagi.');
+                } else if (error.message.includes('respons server')) {
+                    alert('Terjadi kesalahan pada server. Silakan hubungi administrator.');
+                } else {
+                    alert(`Gagal menyimpan:\n${error.message}`);
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Simpan Semua';
+            }
+        });
+
+        function loadUserLoans() {
+            const userId = document.getElementById('user_id').value;
+            const loanSelect = document.getElementById('loan_application_id');
+
+            loanSelect.innerHTML = '<option value="">Memuat Pinjaman...</option>';
+
+            if (!userId) {
+                loanSelect.innerHTML = '<option value="">Pilih Anggota Terlebih Dahulu</option>';
+                return;
+            }
+
+            fetch(`{{ url('get-user-loans') }}/${userId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loanSelect.innerHTML = '<option value="">Pilih Pinjaman</option>';
+
+                    if (data.length === 0) {
+                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif</option>';
+                        return;
+                    }
+
+                    data.forEach(loan => {
+                        if (loan.sisa_durasi_pinjaman > 0) {
+                            const option = document.createElement('option');
+                            option.value = loan.id;
+                            option.textContent =
+                                `Pinjaman #${loan.id} - ${loan.jenis_pinjaman} (Rp ${new Intl.NumberFormat('id-ID').format(loan.jumlah_pinjaman)}) - Sisa ${loan.sisa_durasi_pinjaman} bulan`;
+                            loanSelect.appendChild(option);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading loans:', error);
+                    loanSelect.innerHTML = '<option value="">Error loading loans</option>';
+                });
+        }
+    </script>
+
 @endsection

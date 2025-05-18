@@ -46,6 +46,33 @@ class SavingController extends Controller
             ->with('success', 'Simpanan berhasil ditambahkan.');
     }
 
+    public function jsonStore(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0',
+            'type' => 'required|in:pokok,wajib,sukarela',
+            'date' => 'required|date',
+        ]);
+
+        try {
+            $saving = Saving::create($validated + ['status' => 'pending']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Simpanan berhasil ditambahkan',
+                'data' => $saving,
+                'redirect' => route('savings.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan: ' . $e->getMessage(),
+                'errors' => $e->errors() ?? null
+            ], 422);
+        }
+    }
+
     public function update(Request $request, Saving $saving)
     {
         $request->validate([

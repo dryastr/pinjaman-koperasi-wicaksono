@@ -86,6 +86,11 @@
                             <p class="text-center">
                                 Belum punya akun? <a href="{{ route('register') }}">Daftar</a>
                             </p>
+
+                            {{-- forgot password --}}
+                            <p class="text-center">
+                                <a href="{{ route('password.request') }}">Lupa Password?</a>
+                            </p>
                         </form>
                     </div>
                 </div>

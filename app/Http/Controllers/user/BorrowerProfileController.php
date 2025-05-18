@@ -38,6 +38,7 @@ class BorrowerProfileController extends Controller
             'foto_kk' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'foto_diri' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'jenis_simpanan' => 'required|in:pokok,wajib,sukarela',
+            'tabungan_pokok' => 'required|numeric|min:0',
         ]);
 
         $fotoKtpPath = $request->file('foto_ktp')->store('public/borrower_profiles');
@@ -54,6 +55,7 @@ class BorrowerProfileController extends Controller
             'foto_kk' => str_replace('public/', '', $fotoKkPath),
             'foto_diri' => str_replace('public/', '', $fotoDiriPath),
             'jenis_simpanan' => $request->jenis_simpanan,
+            'tabungan_pokok' => $request->tabungan_pokok,
         ]);
 
         return redirect()->route('borrower-profiles.index')->with('success', 'Profil peminjam berhasil ditambahkan.');
@@ -74,6 +76,7 @@ class BorrowerProfileController extends Controller
             'foto_kk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto_diri' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'jenis_simpanan' => 'required|in:pokok,wajib,sukarela',
+            'tabungan_pokok' => 'required|numeric|min:0',
         ]);
 
         $data = [
@@ -83,6 +86,7 @@ class BorrowerProfileController extends Controller
             'tempat_lahir' => $request->tempat_lahir,
             'pekerjaan' => $request->pekerjaan,
             'jenis_simpanan' => $request->jenis_simpanan,
+            'tabungan_pokok' => $request->tabungan_pokok,
         ];
 
         if ($request->hasFile('foto_ktp')) {

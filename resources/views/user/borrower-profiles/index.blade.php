@@ -14,7 +14,7 @@
                                 data-bs-target="#createBorrowerProfileModal">
                                 Tambah Profil Peminjam
                             </button>
-                            @else
+                        @else
                         @endif
                     </div>
                 </div>
@@ -25,6 +25,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>ID</th>
+                                        <th>Profil Pengguna</th>
                                         <th>Nama User</th>
                                         <th>Alamat</th>
                                         <th>Tanggal Lahir</th>
@@ -38,6 +40,15 @@
                                     @foreach ($profiles as $profile)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $profile->id }}</td>
+                                            {{-- profil pengguna --}}
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <div class="avatar avatar-lg">
+                                                        <img src="{{ Storage::url('') . $profile->foto_diri }}" alt="avatar">
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td>{{ $profile->user->name }}</td>
                                             <td>{{ $profile->alamat }}</td>
                                             <td>{{ $profile->tanggal_lahir->format('d-m-Y') }}</td>
@@ -61,7 +72,7 @@
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item" href="javascript:void(0)"
-                                                                onclick="openEditModal({{ $profile->id }}, {{ $profile->user_id }}, '{{ $profile->alamat }}', '{{ $profile->tanggal_lahir->format('Y-m-d') }}', '{{ $profile->tempat_lahir }}', '{{ $profile->pekerjaan }}', '{{ $profile->jenis_simpanan }}')">
+                                                                onclick="openEditModal({{ $profile->id }}, {{ $profile->user_id }}, '{{ $profile->alamat }}', '{{ $profile->tanggal_lahir->format('Y-m-d') }}', '{{ $profile->tempat_lahir }}', '{{ $profile->pekerjaan }}', '{{ $profile->jenis_simpanan }}', '{{ $profile->tabungan_pokok }}')">
                                                                 Ubah
                                                             </a>
                                                         </li>
@@ -142,6 +153,11 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="tabungan_pokok" class="form-label">Tabungan Pokok (Rp)</label>
+                                    <input type="number" name="tabungan_pokok" class="form-control" required
+                                        placeholder="Masukkan jumlah tabungan pokok">
+                                </div>
+                                <div class="mb-3">
                                     <label for="createFotoKtp" class="form-label">Foto KTP</label>
                                     <input type="file" class="form-control" id="createFotoKtp" name="foto_ktp"
                                         required>
@@ -218,6 +234,11 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="editTabunganPokok" class="form-label">Tabungan Pokok (Rp)</label>
+                                    <input type="number" name="tabungan_pokok" id="editTabunganPokok"
+                                        class="form-control" required placeholder="Masukkan jumlah tabungan pokok">
+                                </div>
+                                <div class="mb-3">
                                     <label for="editFotoKtp" class="form-label">Foto KTP</label>
                                     <input type="file" class="form-control" id="editFotoKtp" name="foto_ktp">
                                     <small class="text-muted">Biarkan kosong jika tidak ingin mengubah</small>
@@ -280,6 +301,10 @@
                                 <p id="detailJenisSimpanan" class="form-control-plaintext"></p>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label fw-bold">Tabungan Pokok (Rp)</label>
+                                <p id="detailTabunganPokok" class="form-control-plaintext"></p>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label fw-bold">Foto KTP</label>
                                 <a id="detailFotoKtpLink" href="#" target="_blank" class="d-block">
                                     <img id="detailFotoKtpPreview" src="" alt="Foto KTP" class="img-thumbnail"
@@ -317,7 +342,7 @@
     </div>
 
     <script>
-        function openEditModal(id, userId, alamat, tanggalLahir, tempatLahir, pekerjaan, jenisSimpanan) {
+        function openEditModal(id, userId, alamat, tanggalLahir, tempatLahir, pekerjaan, jenisSimpanan, tabunganPokok) {
             document.getElementById('editProfileId').value = id;
             document.getElementById('editUserId').value = userId;
             document.getElementById('editAlamat').value = alamat;
@@ -325,6 +350,7 @@
             document.getElementById('editTempatLahir').value = tempatLahir;
             document.getElementById('editPekerjaan').value = pekerjaan;
             document.getElementById('editJenisSimpanan').value = jenisSimpanan;
+            document.getElementById('editTabunganPokok').value = tabunganPokok;
 
             document.getElementById('editBorrowerProfileForm').action = 'borrower-profiles/' + id;
 
@@ -342,6 +368,9 @@
             document.getElementById('detailPekerjaan').textContent = profile.pekerjaan;
             document.getElementById('detailJenisSimpanan').textContent = profile.jenis_simpanan.charAt(0).toUpperCase() +
                 profile.jenis_simpanan.slice(1);
+
+            document.getElementById('detailTabunganPokok').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(
+                profile.tabungan_pokok);
 
             const baseUrl = '{{ Storage::url('') }}';
             document.getElementById('detailFotoKtpPreview').src = baseUrl + profile.foto_ktp;

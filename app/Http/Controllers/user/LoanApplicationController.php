@@ -4,6 +4,8 @@ namespace App\Http\Controllers\user;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoanApplication;
+use App\Models\LoanPayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class LoanApplicationController extends Controller
@@ -17,7 +19,35 @@ class LoanApplicationController extends Controller
             ->where('user_id', auth()->id())
             ->get();
 
-        return view('user.loan-applications.index', compact('loans'));
+        $warnings = [];
+
+        foreach ($loans as $loan) {
+            $payments = LoanPayment::where('loan_application_id', $loan->id)
+                ->orderBy('tanggal_pembayaran', 'desc')
+                ->pluck('tanggal_pembayaran');
+
+            $now = Carbon::now();
+            $missingWeeks = 0;
+
+            for ($i = 0; $i < 3; $i++) {
+                $startOfWeek = $now->copy()->subWeeks($i)->startOfWeek();
+                $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
+
+                $paidThisWeek = $payments->contains(function ($paymentDate) use ($startOfWeek, $endOfWeek) {
+                    return Carbon::parse($paymentDate)->between($startOfWeek, $endOfWeek);
+                });
+
+                if (!$paidThisWeek) {
+                    $missingWeeks++;
+                }
+            }
+
+            if ($missingWeeks === 3) {
+                $warnings[] = "Pinjaman ID #{$loan->id} | {$loan->jenis_pinjaman} - Anda belum dibayar selama 3 minggu berturut-turut!";
+            }
+        }
+
+        return view('user.loan-applications.index', compact('loans', 'warnings'));
     }
 
     /**
@@ -75,5 +105,15 @@ class LoanApplicationController extends Controller
 
         return redirect()->route('loan-applications.index')
             ->with('success', 'Pengajuan pinjaman berhasil dihapus.');
+    }
+
+    public function printActiveLoans()
+    {
+        $loans = LoanApplication::with(['user', 'payments'])
+            ->where('user_id', auth()->id())
+            ->where('sisa_durasi_pinjaman', '>', 0)
+            ->get();
+
+        return view('user.loan-applications.print', compact('loans'));
     }
 }

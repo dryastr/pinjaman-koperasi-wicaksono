@@ -12,7 +12,7 @@
                 <div class="card-content">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-xl">
+                            <table class="table table-xl" style="margin-top: 25px!important">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -27,10 +27,11 @@
                                     @foreach ($users as $user)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->email }}</td>
+                                            <td>{{ $user->user->name }}</td>
+                                            <td>{{ $user->user->email }}</td>
                                             <td>
-                                                <span class="badge bg-{{ $user->status == 'accepted' ? 'success' : ($user->status == 'rejected' ? 'danger' : 'warning') }}">
+                                                <span
+                                                    class="badge bg-{{ $user->status == 'accepted' ? 'success' : ($user->status == 'rejected' ? 'danger' : 'warning') }}">
                                                     {{ ucfirst($user->status) }}
                                                 </span>
                                             </td>
@@ -46,12 +47,19 @@
                                                         aria-labelledby="dropdownMenuButton-{{ $user->id }}">
                                                         <li>
                                                             <a class="dropdown-item" href="javascript:void(0)"
+                                                                onclick='showDetailModal(@json($user))'>
+                                                                Lihat Detail
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item" href="javascript:void(0)"
                                                                 onclick="openEditModal({{ $user->id }}, '{{ $user->status }}')">
                                                                 Ubah Status
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <form action="{{ route('manage-approval-users.destroy', $user->id) }}"
+                                                            <form
+                                                                action="{{ route('manage-approval-users.destroy', $user->id) }}"
                                                                 method="POST"
                                                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?')">
                                                                 @csrf
@@ -76,8 +84,7 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -104,15 +111,94 @@
         </div>
     </div>
 
+    <!-- Detail Profil -->
+    <div class="modal fade" id="detailProfileModal" tabindex="-1" aria-labelledby="detailProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Profil Peminjam</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <strong>Nama:</strong>
+                        <div id="detail-nama" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Alamat:</strong>
+                        <div id="detail-alamat" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tempat Lahir:</strong>
+                        <div id="detail-tempat-lahir" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tanggal Lahir:</strong>
+                        <div id="detail-tanggal-lahir" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Pekerjaan:</strong>
+                        <div id="detail-pekerjaan" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Jenis Simpanan:</strong>
+                        <div id="detail-jenis-simpanan" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tabungan Pokok:</strong>
+                        <div id="detail-tabungan-pokok" class="text-muted"></div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Status:</strong>
+                        <div id="detail-status" class="text-muted"></div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Foto KTP:</strong><br>
+                        <img id="detail-ktp" src="" class="img-fluid rounded" width="200" />
+                    </div>
+                    <div class="mb-3">
+                        <strong>Foto KK:</strong><br>
+                        <img id="detail-kk" src="" class="img-fluid rounded" width="200" />
+                    </div>
+                    <div class="mb-3">
+                        <strong>Foto Diri:</strong><br>
+                        <img id="detail-diri" src="" class="img-fluid rounded" width="200" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         function openEditModal(id, status) {
             document.getElementById('editUserId').value = id;
             document.getElementById('editStatus').value = status;
 
-            document.getElementById('editUserForm').action = '{{ route("manage-approval-users.update", "") }}/' + id;
+            document.getElementById('editUserForm').action = '{{ route('manage-approval-users.update', '') }}/' + id;
 
             var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
             editModal.show();
         }
     </script>
+    <script>
+        function showDetailModal(profile) {
+            document.getElementById('detail-nama').innerText = profile.user?.name || '-';
+            document.getElementById('detail-alamat').innerText = profile.alamat || '-';
+            document.getElementById('detail-tempat-lahir').innerText = profile.tempat_lahir || '-';
+            document.getElementById('detail-tanggal-lahir').innerText = profile.tanggal_lahir || '-';
+            document.getElementById('detail-pekerjaan').innerText = profile.pekerjaan || '-';
+            document.getElementById('detail-jenis-simpanan').innerText = profile.jenis_simpanan || '-';
+            document.getElementById('detail-tabungan-pokok').innerText = profile.tabungan_pokok || '-';
+            document.getElementById('detail-status').innerText = profile.status || '-';
+
+            document.getElementById('detail-ktp').src = '/storage/' + profile.foto_ktp;
+            document.getElementById('detail-kk').src = '/storage/' + profile.foto_kk;
+            document.getElementById('detail-diri').src = '/storage/' + profile.foto_diri;
+
+            new bootstrap.Modal(document.getElementById('detailProfileModal')).show();
+        }
+    </script>
+
 @endsection

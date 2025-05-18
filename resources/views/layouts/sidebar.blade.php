@@ -65,32 +65,33 @@
                         </li>
                     </ul>
                 </li>
+                @if (auth()->user()->borrowerProfile)
+                    <li class="sidebar-item has-sub {{ Request::is('loan-applications*') ? 'active' : '' }}">
+                        <a href="#" class='sidebar-link'>
+                            <i class="bi bi-card-checklist"></i>
+                            <span>Pengajuan Pinjaman</span>
+                        </a>
 
-                <li class="sidebar-item has-sub {{ Request::is('loan-applications*') ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
-                        <i class="bi bi-card-checklist"></i>
-                        <span>Pengajuan Pinjaman</span>
-                    </a>
+                        <ul class="submenu">
+                            <li class="submenu-item {{ Request::routeIs('loan-applications.index') ? 'active' : '' }}">
+                                <a href="{{ route('loan-applications.index') }}" class="submenu-link">Lihat</a>
+                            </li>
+                        </ul>
+                    </li>
 
-                    <ul class="submenu">
-                        <li class="submenu-item {{ Request::routeIs('loan-applications.index') ? 'active' : '' }}">
-                            <a href="{{ route('loan-applications.index') }}" class="submenu-link">Lihat</a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="sidebar-item has-sub {{ Request::is('my-savings*') ? 'active' : '' }}">
+                        <a href="#" class='sidebar-link'>
+                            <i class="bi bi-card-checklist"></i>
+                            <span>Tabungan</span>
+                        </a>
 
-                <li class="sidebar-item has-sub {{ Request::is('my-savings*') ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
-                        <i class="bi bi-card-checklist"></i>
-                        <span>Tabungan</span>
-                    </a>
-
-                    <ul class="submenu">
-                        <li class="submenu-item {{ Request::routeIs('my-savings.index') ? 'active' : '' }}">
-                            <a href="{{ route('my-savings.index') }}" class="submenu-link">Lihat</a>
-                        </li>
-                    </ul>
-                </li>
+                        <ul class="submenu">
+                            <li class="submenu-item {{ Request::routeIs('my-savings.index') ? 'active' : '' }}">
+                                <a href="{{ route('my-savings.index') }}" class="submenu-link">Lihat</a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
             @endif
 
             @if (auth()->user()->role->name == 'supervisor')
@@ -136,28 +137,32 @@
             @endif
 
             @if (auth()->user()->role->name == 'petugas')
-                <li class="sidebar-item has-sub {{ Request::is('savings*') ? 'active' : '' }}">
+                <li
+                    class="sidebar-item has-sub {{ Request::is('savings*') || Request::is('loan-payments*') ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-card-checklist"></i>
                         <span>Tabungan</span>
                     </a>
 
                     <ul class="submenu">
+                        <li class="submenu-item {{ Request::routeIs('loan-payments.index') ? 'active' : '' }}">
+                            <a href="{{ route('loan-payments.index') }}" class="submenu-link">Lihat Pinjaman</a>
+                        </li>
                         <li class="submenu-item {{ Request::routeIs('savings.index') ? 'active' : '' }}">
-                            <a href="{{ route('savings.index') }}" class="submenu-link">Lihat</a>
+                            <a href="{{ route('savings.index') }}" class="submenu-link">Lihat Tabungan</a>
                         </li>
                     </ul>
                 </li>
 
-                <li class="sidebar-item has-sub {{ Request::is('loan-payments*') ? 'active' : '' }}">
+                <li class="sidebar-item has-sub {{ Request::is('office-incomes*') ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-card-checklist"></i>
-                        <span>Bayar Pinjaman</span>
+                        <span>Pendapatan Kantor</span>
                     </a>
 
                     <ul class="submenu">
-                        <li class="submenu-item {{ Request::routeIs('loan-payments.index') ? 'active' : '' }}">
-                            <a href="{{ route('loan-payments.index') }}" class="submenu-link">Lihat</a>
+                        <li class="submenu-item {{ Request::routeIs('office-incomes.index') ? 'active' : '' }}">
+                            <a href="{{ route('office-incomes.index') }}" class="submenu-link">Lihat</a>
                         </li>
                     </ul>
                 </li>

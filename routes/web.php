@@ -6,6 +6,8 @@ use App\Http\Controllers\admin\AdminTransactionHistoryUserController;
 use App\Http\Controllers\admin\ViewUserController;
 use App\Http\Controllers\petugas\ApprovalSavingController;
 use App\Http\Controllers\petugas\AprrovalPaymentUserController;
+use App\Http\Controllers\petugas\OfficeIncomeController;
+use App\Http\Controllers\petugas\OfficeIncomeJSONController;
 use App\Http\Controllers\petugas\PetugasController;
 use App\Http\Controllers\petugas\TransactionHistoryUserController;
 use App\Http\Controllers\supervisor\ManageApprovalUserController;
@@ -54,7 +56,8 @@ Route::middleware(['auth', 'role.user'])->group(function () {
     Route::get('/home', [UserController::class, 'index'])->name('home');
 
     Route::resource('borrower-profiles', BorrowerProfileController::class);
-    Route::resource('loan-applications', LoanApplicationController::class);
+    Route::resource('loan-applications', LoanApplicationController::class)->except('show');
+    Route::get('/loan-applications/print', [LoanApplicationController::class, 'printActiveLoans'])->name('loan-applications.print');
     Route::resource('my-savings', ViewSavingController::class);
 });
 
@@ -62,8 +65,11 @@ Route::middleware(['auth', 'role.petugas'])->group(function () {
     Route::get('/petugas', [PetugasController::class, 'index'])->name('petugas.dashboard');
 
     Route::resource('loan-payments', LoanPaymentController::class);
+    Route::resource('office-incomes', OfficeIncomeController::class);
+    Route::resource('office-incomes-json', OfficeIncomeJSONController::class);
     Route::get('get-user-loans/{userId}', [LoanPaymentController::class, 'getUserLoans'])->name('admin.get-user-loans');
     Route::resource('savings', SavingController::class);
+    Route::post('/savings-json', [SavingController::class, 'jsonStore'])->name('savings.storejson');
     Route::resource('transaction-history', TransactionHistoryUserController::class);
 });
 
