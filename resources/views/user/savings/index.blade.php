@@ -23,11 +23,11 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Anggota</th>
-                                        <th>Jumlah</th>
-                                        <th>Jenis</th>
+                                        <th>Wajib (Rp)</th>
+                                        <th>Sukarela (Rp)</th>
+                                        <th>Total (Rp)</th>
                                         <th>Tanggal</th>
                                         <th>Status</th>
-                                        <th>Petugas</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -36,12 +36,10 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $saving->user->name }}</td>
-                                            <td>Rp {{ number_format($saving->amount, 0, ',', '.') }}</td>
-                                            <td>
-                                                <span
-                                                    class="badge bg-{{ $saving->type == 'pokok' ? 'primary' : ($saving->type == 'wajib' ? 'info' : 'secondary') }}">
-                                                    {{ ucfirst($saving->type) }}
-                                                </span>
+                                            <td>Rp {{ number_format($saving->wajib_amount, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($saving->sukarela_amount, 0, ',', '.') }}</td>
+                                            <td>Rp
+                                                {{ number_format($saving->wajib_amount + $saving->sukarela_amount, 0, ',', '.') }}
                                             </td>
                                             <td>{{ $saving->date->format('d M Y') }}</td>
                                             <td>
@@ -50,12 +48,11 @@
                                                     {{ ucfirst($saving->status) }}
                                                 </span>
                                             </td>
-                                            <td>{{ $saving->processor->name ?? '-' }}</td>
                                             <td class="text-nowrap">
                                                 @if ($saving->status == 'pending')
                                                     <div class="btn-group" role="group">
                                                         <button type="button" class="btn btn-sm btn-warning"
-                                                            onclick="openEditModal({{ $saving->id }}, {{ $saving->user_id }}, {{ $saving->amount }}, '{{ $saving->type }}', '{{ $saving->date->format('Y-m-d') }}')">
+                                                            onclick="openEditModal({{ $saving->id }}, {{ $saving->user_id }}, {{ $saving->wajib_amount }}, {{ $saving->sukarela_amount }}, '{{ $saving->date->format('Y-m-d') }}')">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </button>
                                                         <form action="{{ route('savings.destroy', $saving->id) }}"
@@ -83,7 +80,6 @@
         </div>
     </div>
 
-    <!-- Create Modal -->
     <div class="modal fade" id="createSavingModal" tabindex="-1" aria-labelledby="createSavingModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -106,18 +102,14 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="createAmount" class="form-label">Jumlah (Rp)</label>
-                            <input type="number" class="form-control" id="createAmount" name="amount" min="10000"
-                                required>
+                            <label for="createWajibAmount" class="form-label">Jumlah Wajib (Rp)</label>
+                            <input type="number" class="form-control" id="createWajibAmount" name="wajib_amount"
+                                min="0" value="0">
                         </div>
                         <div class="mb-3">
-                            <label for="createType" class="form-label">Jenis Simpanan</label>
-                            <select class="form-select" id="createType" name="type" required>
-                                <option value="">Pilih Jenis</option>
-                                <option value="pokok">Pokok</option>
-                                <option value="wajib">Wajib</option>
-                                <option value="sukarela">Sukarela</option>
-                            </select>
+                            <label for="createSukarelaAmount" class="form-label">Jumlah Sukarela (Rp)</label>
+                            <input type="number" class="form-control" id="createSukarelaAmount" name="sukarela_amount"
+                                min="0" value="0">
                         </div>
                         <div class="mb-3">
                             <label for="createDate" class="form-label">Tanggal</label>
@@ -133,7 +125,6 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div class="modal fade" id="editSavingModal" tabindex="-1" aria-labelledby="editSavingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -156,17 +147,14 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="editAmount" class="form-label">Jumlah (Rp)</label>
-                            <input type="number" class="form-control" id="editAmount" name="amount" min="10000"
-                                required>
+                            <label for="editWajibAmount" class="form-label">Jumlah Wajib (Rp)</label>
+                            <input type="number" class="form-control" id="editWajibAmount" name="wajib_amount"
+                                min="0">
                         </div>
                         <div class="mb-3">
-                            <label for="editType" class="form-label">Jenis Simpanan</label>
-                            <select class="form-select" id="editType" name="type" required>
-                                <option value="pokok">Pokok</option>
-                                <option value="wajib">Wajib</option>
-                                <option value="sukarela">Sukarela</option>
-                            </select>
+                            <label for="editSukarelaAmount" class="form-label">Jumlah Sukarela (Rp)</label>
+                            <input type="number" class="form-control" id="editSukarelaAmount" name="sukarela_amount"
+                                min="0">
                         </div>
                         <div class="mb-3">
                             <label for="editDate" class="form-label">Tanggal</label>
@@ -183,11 +171,11 @@
     </div>
 
     <script>
-        function openEditModal(id, userId, amount, type, date) {
+        function openEditModal(id, userId, wajibAmount, sukarelaAmount, date) {
             document.getElementById('editSavingId').value = id;
             document.getElementById('editUserId').value = userId;
-            document.getElementById('editAmount').value = amount;
-            document.getElementById('editType').value = type;
+            document.getElementById('editWajibAmount').value = wajibAmount;
+            document.getElementById('editSukarelaAmount').value = sukarelaAmount;
             document.getElementById('editDate').value = date;
 
             document.getElementById('editSavingForm').action = '{{ route('savings.update', '') }}/' + id;

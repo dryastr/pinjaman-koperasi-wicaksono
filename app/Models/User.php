@@ -63,4 +63,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Saving::class);
     }
+
+    public function isAdmin()
+    {
+        return $this->role->name === 'admin';
+    }
 }

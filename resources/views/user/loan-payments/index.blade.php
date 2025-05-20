@@ -95,7 +95,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <!-- Form Simpanan -->
+                    {{-- Form Simpanan --}}
                     <form id="savingForm" class="mb-4 border-bottom pb-4">
                         @csrf
                         <h6 class="fw-bold">Pembayaran Simpanan</h6>
@@ -105,46 +105,43 @@
                                 <select class="form-select" id="createUserId" name="user_id" required>
                                     <option value="">Pilih Anggota</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                        </option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="createAmount" class="form-label">Jumlah (Rp)</label>
-                                <input type="number" class="form-control" id="createAmount" name="amount" required>
+                                <label for="createWajibAmount" class="form-label">Jumlah Simpanan Wajib (Rp)</label>
+                                <input type="number" class="form-control" id="createWajibAmount" name="wajib_amount"
+                                    required>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="createType" class="form-label">Jenis Simpanan</label>
-                                <select class="form-select" id="createType" name="type" required>
-                                    <option value="">Pilih Jenis</option>
-                                    <option value="pokok">Pokok</option>
-                                    <option value="wajib">Wajib</option>
-                                    <option value="sukarela">Sukarela</option>
-                                </select>
+                                <label for="createSukarelaAmount" class="form-label">Jumlah Simpanan Sukarela (Rp)</label>
+                                <input type="number" class="form-control" id="createSukarelaAmount" name="sukarela_amount"
+                                    required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="createDate" class="form-label">Tanggal</label>
                                 <input type="date" class="form-control" id="createDate" name="date" required>
                             </div>
+                            <div class="col-md-6 mb-3 d-none">
+                                <label for="createAmount" class="form-label">Jumlah (Rp)</label>
+                                <input type="hidden" class="form-control" id="createAmount" name="amount" value="0"
+                                    required>
+                            </div>
                         </div>
                     </form>
 
-                    <!-- Form Pembayaran Pinjaman -->
+                    {{-- Form Pinjaman --}}
                     <form id="paymentForm" class="mb-4 border-bottom pb-4" enctype="multipart/form-data">
                         @csrf
                         <h6 class="fw-bold">Pembayaran Pinjaman</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="user_id" class="form-label">Anggota</label>
-                                <select class="form-select" id="user_id" name="user_id" required
-                                    onchange="loadUserLoans()">
+                                <select class="form-select" id="user_id" name="user_id" required>
                                     <option value="">Pilih Anggota</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                        </option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -190,18 +187,17 @@
                         </div>
                     </form>
 
-                    <!-- Form Pendapatan Kantor (New) -->
+                    {{-- Form Iuran --}}
                     <form id="incomeForm" enctype="multipart/form-data">
                         @csrf
-                        <h6 class="fw-bold">Pendapatan Kantor</h6>
+                        <h6 class="fw-bold">Iuran</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="incomeUserId" class="form-label">Penerima</label>
                                 <select class="form-select" id="incomeUserId" name="user_id" required>
                                     <option value="">Pilih Pengguna</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                        </option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -558,6 +554,18 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Simpan Semua';
+            }
+        });
+
+        document.getElementById('createUserId').addEventListener('change', function() {
+            const selectedUserId = this.value;
+
+            document.getElementById('user_id').value = selectedUserId;
+
+            document.getElementById('incomeUserId').value = selectedUserId;
+
+            if (selectedUserId) {
+                loadUserLoans();
             }
         });
 

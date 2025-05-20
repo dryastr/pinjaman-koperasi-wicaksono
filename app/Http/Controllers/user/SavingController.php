@@ -29,14 +29,18 @@ class SavingController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:10000',
-            'type' => 'required|in:pokok,wajib,sukarela',
+            'amount' => 'nullable|numeric|min:0',
+            'wajib_amount' => 'nullable|numeric|min:0',
+            'sukarela_amount' => 'nullable|numeric|min:0',
+            'type' => 'nullable|in:pokok,wajib,sukarela',
             'date' => 'required|date',
         ]);
 
         Saving::create([
             'user_id' => $request->user_id,
             'amount' => $request->amount,
+            'wajib_amount' => $request->wajib_amount,
+            'sukarela_amount' => $request->sukarela_amount,
             'type' => $request->type,
             'date' => $request->date,
             'status' => 'pending',
@@ -51,7 +55,9 @@ class SavingController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0',
-            'type' => 'required|in:pokok,wajib,sukarela',
+            'wajib_amount' => 'nullable|numeric|min:0',
+            'sukarela_amount' => 'nullable|numeric|min:0',
+            'type' => 'nullable|in:pokok,wajib,sukarela',
             'date' => 'required|date',
         ]);
 
@@ -77,14 +83,18 @@ class SavingController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:10000',
-            'type' => 'required|in:pokok,wajib,sukarela',
+            'amount' => 'nullable|numeric|min:0',
+            'wajib_amount' => 'nullable|numeric|min:0',
+            'sukarela_amount' => 'nullable|numeric|min:0',
+            'type' => 'nullable|in:pokok,wajib,sukarela',
             'date' => 'required|date',
         ]);
 
         $saving->update([
             'user_id' => $request->user_id,
             'amount' => $request->amount,
+            'wajib_amount' => $request->wajib_amount,
+            'sukarela_amount' => $request->sukarela_amount,
             'type' => $request->type,
             'date' => $request->date,
         ]);
@@ -93,9 +103,6 @@ class SavingController extends Controller
             ->with('success', 'Simpanan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified saving.
-     */
     public function destroy(Saving $saving)
     {
         if ($saving->status !== 'pending') {

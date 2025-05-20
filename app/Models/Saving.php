@@ -12,6 +12,8 @@ class Saving extends Model
     protected $fillable = [
         'user_id',
         'amount',
+        'wajib_amount',
+        'sukarela_amount',
         'type',
         'date',
         'status',

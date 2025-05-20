@@ -8,10 +8,10 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex align-items-center justify-content-between">
-                        <h4 class="card-title">Daftar Pendapatan Kantor</h4>
+                        <h4 class="card-title">Daftar Iuran</h4>
                         <button type="button" class="btn btn-success" data-bs-toggle="modal"
                             data-bs-target="#createIncomeModal">
-                            Tambah Pendapatan
+                            Tambah Iuran
                         </button>
                     </div>
                 </div>
@@ -28,7 +28,9 @@
                                         <th>Tanggal</th>
                                         <th>Metode</th>
                                         <th>Bukti</th>
-                                        <th>Aksi</th>
+                                        @unless (auth()->user()->isAdmin())
+                                            <th>Aksi</th>
+                                        @endunless
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,23 +52,25 @@
                                                     -
                                                 @endif
                                             </td>
-                                            <td class="text-nowrap">
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-warning"
-                                                        onclick="openEditModal({{ $income->id }}, {{ $income->user_id }}, '{{ $income->description }}', {{ $income->amount }}, '{{ $income->payment_date->format('Y-m-d') }}', '{{ $income->payment_method }}')">
-                                                        <i class="bi bi-pencil-square"></i>
-                                                    </button>
-                                                    <form action="{{ route('office-incomes.destroy', $income->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger"
-                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus pendapatan ini?')">
-                                                            <i class="bi bi-trash"></i>
+                                            @unless (auth()->user()->isAdmin())
+                                                <td class="text-nowrap">
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-warning"
+                                                            onclick="openEditModal({{ $income->id }}, {{ $income->user_id }}, '{{ $income->description }}', {{ $income->amount }}, '{{ $income->payment_date->format('Y-m-d') }}', '{{ $income->payment_method }}')">
+                                                            <i class="bi bi-pencil-square"></i>
                                                         </button>
-                                                    </form>
-                                                </div>
-                                            </td>
+                                                        <form action="{{ route('office-incomes.destroy', $income->id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Apakah Anda yakin ingin menghapus pendapatan ini?')">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            @endunless
                                         </tr>
                                     @endforeach
                                 </tbody>

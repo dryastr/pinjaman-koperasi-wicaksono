@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role.admin'])->group(function () {
     Route::resource('accounts', AddAccountController::class);
     Route::resource('transaction-history-admin', AdminTransactionHistoryUserController::class);
     Route::resource('view-users', ViewUserController::class);
+    Route::resource('iuran-admin', OfficeIncomeController::class);
 });
 
 Route::middleware(['auth', 'role.user'])->group(function () {

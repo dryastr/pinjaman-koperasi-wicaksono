@@ -157,7 +157,7 @@
                 <li class="sidebar-item has-sub {{ Request::is('office-incomes*') ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-card-checklist"></i>
-                        <span>Pendapatan Kantor</span>
+                        <span>Iuran</span>
                     </a>
 
                     <ul class="submenu">
@@ -230,6 +230,19 @@
                     <ul class="submenu">
                         <li class="submenu-item {{ Request::routeIs('approval-savings.index') ? 'active' : '' }}">
                             <a href="{{ route('approval-savings.index') }}" class="submenu-link">Lihat</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item has-sub {{ Request::is('iuran-admin*') ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-card-checklist"></i>
+                        <span>Iuran</span>
+                    </a>
+
+                    <ul class="submenu">
+                        <li class="submenu-item {{ Request::routeIs('iuran-admin.index') ? 'active' : '' }}">
+                            <a href="{{ route('iuran-admin.index') }}" class="submenu-link">Lihat</a>
                         </li>
                     </ul>
                 </li>
