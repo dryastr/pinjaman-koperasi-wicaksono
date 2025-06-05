@@ -49,8 +49,21 @@
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $saving->user->name }}</td>
-                                                        <td>Rp {{ number_format($saving->amount, 0, ',', '.') }}</td>
-                                                        <td>{{ ucfirst($saving->type) }}</td>
+                                                        <td>
+                                                            @if($saving->amount == 0)
+                                                                Wajib: Rp {{ number_format($saving->wajib_amount, 0, ',', '.') }}<br>
+                                                                Sukarela: Rp {{ number_format($saving->sukarela_amount, 0, ',', '.') }}
+                                                            @else
+                                                                Rp {{ number_format($saving->amount, 0, ',', '.') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if($saving->type)
+                                                                {{ ucfirst($saving->type) }}
+                                                            @else
+                                                                Tidak ada
+                                                            @endif
+                                                        </td>
                                                         <td>{{ $saving->date->format('d M Y') }}</td>
                                                         <td>
                                                             <span

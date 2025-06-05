@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\BorrowerProfile;
 use App\Models\LoanApplication;
+use App\Models\OfficeIncome;
 use App\Models\Saving;
 use App\Models\User;
 
@@ -16,10 +17,15 @@ class AdminController extends Controller
         $bisnisLoans = LoanApplication::where('jenis_pinjaman', 'bisnis')->count();
         $totalLoans = $qardhLoans + $bisnisLoans;
 
-        $pokokSavings = Saving::where('type', 'pokok')->where('status', 'approved')->count();
-        $wajibSavings = Saving::where('type', 'wajib')->where('status', 'approved')->count();
-        $sukarelaSavings = Saving::where('type', 'sukarela')->where('status', 'approved')->count();
-        $totalSavings = $pokokSavings + $wajibSavings + $sukarelaSavings;
+        $totalAmountSavings = Saving::where('status', 'approved')->sum('amount');
+        $totalWajibAmountSavings = Saving::where('status', 'approved')->sum('wajib_amount');
+        $totalSukarelaAmountSavings = Saving::where('status', 'approved')->sum('sukarela_amount');
+
+        $totalSavings = $totalAmountSavings + $totalWajibAmountSavings + $totalSukarelaAmountSavings;
+
+        $iuran = OfficeIncome::all()->sum('amount');
+
+        $totalAmountLoans = LoanApplication::where('status', 'accepted')->sum('jumlah_pinjaman');
 
         $totalUsers = User::count();
         $activeUsers = User::where('status', 'accepted')->count();
@@ -30,23 +36,25 @@ class AdminController extends Controller
         ];
 
         $savingChartData = [
-            'pokok' => $pokokSavings,
-            'wajib' => $wajibSavings,
-            'sukarela' => $sukarelaSavings
+            'amount' => $totalAmountSavings,
+            'wajib_amount' => $totalWajibAmountSavings,
+            'sukarela_amount' => $totalSukarelaAmountSavings
         ];
 
         return view('admin.dashboard', compact(
             'qardhLoans',
             'bisnisLoans',
             'totalLoans',
-            'pokokSavings',
-            'wajibSavings',
-            'sukarelaSavings',
+            'totalAmountSavings',
+            'totalWajibAmountSavings',
+            'totalSukarelaAmountSavings',
             'totalSavings',
             'totalUsers',
             'activeUsers',
             'loanChartData',
-            'savingChartData'
+            'savingChartData',
+            'iuran',
+            'totalAmountLoans'
         ));
     }
 }

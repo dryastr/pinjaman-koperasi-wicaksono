@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoanApplication;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -16,8 +17,11 @@ class SupervisorController extends Controller
             ->get();
 
         $pendingCount = $pendingUsers->count();
+
         $approvedToday = User::where('status', 'accepted')
+            ->whereDate('updated_at', Carbon::today())
             ->count();
+
         $totalMembers = User::where('status', 'accepted')->count();
 
         $approvalDates = [];
@@ -27,8 +31,17 @@ class SupervisorController extends Controller
             $date = Carbon::today()->subDays($i);
             $approvalDates[] = $date->format('d M');
             $approvalData[] = User::where('status', 'accepted')
+                ->whereDate('updated_at', $date)
                 ->count();
         }
+
+        $pendingLoanApplications = LoanApplication::where('status', 'pending')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pendingLoanCount = $pendingLoanApplications->count();
+
 
         return view('supervisor.dashboard', compact(
             'pendingUsers',
@@ -36,7 +49,9 @@ class SupervisorController extends Controller
             'approvedToday',
             'totalMembers',
             'approvalDates',
-            'approvalData'
+            'approvalData',
+            'pendingLoanApplications',
+            'pendingLoanCount'
         ));
     }
 

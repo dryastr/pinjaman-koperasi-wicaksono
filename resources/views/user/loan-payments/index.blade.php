@@ -105,7 +105,8 @@
                                 <select class="form-select" id="createUserId" name="user_id" required>
                                     <option value="">Pilih Anggota</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -141,7 +142,8 @@
                                 <select class="form-select" id="user_id" name="user_id" required>
                                     <option value="">Pilih Anggota</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -197,7 +199,8 @@
                                 <select class="form-select" id="incomeUserId" name="user_id" required>
                                     <option value="">Pilih Pengguna</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -371,6 +374,9 @@
     </div>
 
     <script>
+        const currentPetugasId = {{ Auth::id() }};
+    </script>
+    <script>
         function showDetailModal(payment, jenisPinjaman, namaAnggota) {
             document.getElementById('detailNamaAnggota').textContent = namaAnggota;
             document.getElementById('detailPinjaman').textContent = 'Pinjaman #' + payment.loan_application_id + ' - ' +
@@ -445,21 +451,19 @@
                     loanSelect.innerHTML = '<option value="">Pilih Pinjaman</option>';
 
                     if (data.length === 0) {
-                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif</option>';
+                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif Untuk Anda</option>';
                         return;
                     }
 
                     data.forEach(loan => {
-                        const option = document.createElement('option');
-                        option.value = loan.id;
-                        option.textContent =
-                            `Pinjaman #${loan.id} - ${loan.jenis_pinjaman} (Rp ${new Intl.NumberFormat('id-ID').format(loan.jumlah_pinjaman)}) - Sisa ${loan.sisa_durasi_pinjaman} bulan`;
-
-                        if (loan.id == selectedLoanId) {
-                            option.selected = true;
+                        if (loan.sisa_durasi_pinjaman >
+                            0) {
+                            const option = document.createElement('option');
+                            option.value = loan.id;
+                            option.textContent =
+                                `Pinjaman #${loan.id} - ${loan.jenis_pinjaman} (Rp ${new Intl.NumberFormat('id-ID').format(loan.jumlah_pinjaman)}) - Sisa ${loan.sisa_durasi_pinjaman} bulan`;
+                            loanSelect.appendChild(option);
                         }
-
-                        loanSelect.appendChild(option);
                     });
                 })
                 .catch(error => {
@@ -590,12 +594,14 @@
                 .then(data => {
                     loanSelect.innerHTML = '<option value="">Pilih Pinjaman</option>';
 
-                    if (data.length === 0) {
-                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif</option>';
+                    const acceptedLoans = data.filter(loan => loan.status === 'accepted');
+
+                    if (acceptedLoans.length === 0) {
+                        loanSelect.innerHTML = '<option value="">Tidak Ada Pinjaman Aktif Yang Diterima</option>';
                         return;
                     }
 
-                    data.forEach(loan => {
+                    acceptedLoans.forEach(loan => {
                         if (loan.sisa_durasi_pinjaman > 0) {
                             const option = document.createElement('option');
                             option.value = loan.id;

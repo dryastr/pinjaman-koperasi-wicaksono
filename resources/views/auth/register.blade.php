@@ -33,9 +33,6 @@
             <div class="authentication-inner">
                 <div class="card">
                     <div class="card-body">
-                        <div id="approvalMessage" class="alert alert-warning d-none" role="alert">
-                            Akun Anda sedang menunggu persetujuan. Silakan login setelah disetujui.
-                        </div>
 
                         <h4 class="mb-2">Daftar Akun Baru!</h4>
                         <p class="mb-4">Silahkan isi form di bawah untuk mendaftar</p>
@@ -99,25 +96,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const approvalMessage = document.getElementById('approvalMessage');
-            const storedEmail = localStorage.getItem('pending_email');
-
-            if (storedEmail) {
-                approvalMessage.classList.remove('d-none');
-            }
-
-            const form = document.getElementById('registerForm');
-            form.addEventListener('submit', function(e) {
-                const emailInput = document.getElementById('email');
-                if (emailInput && emailInput.value) {
-                    localStorage.setItem('pending_email', emailInput.value);
-                }
-            });
-        });
-    </script>
 
 
     <script src="{{ asset('assets-auth/vendor/libs/jquery/jquery.js') }}"></script>

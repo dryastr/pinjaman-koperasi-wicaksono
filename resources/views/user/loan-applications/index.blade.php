@@ -56,11 +56,16 @@
                                             <td>{{ $loan->jenis_pinjaman }}</td>
                                             <td>Rp {{ number_format($loan->jumlah_pinjaman, 0, ',', '.') }}</td>
                                             <td>
-                                                {{ $loan->sisa_durasi_pinjaman }}
-                                                Minggu
+                                                @if ($loan->status !== 'approved')
+                                                    {{ $loan->sisa_durasi_pinjaman + 1 }} Minggu
+                                                @else
+                                                    {{ $loan->sisa_durasi_pinjaman }} Minggu
+                                                @endif
                                             </td>
                                             <td>
-                                                @if ($loan->sisa_durasi_pinjaman == 0)
+                                                @if ($loan->status !== 'approved')
+                                                    {{ $loan->sisa_durasi_pinjaman + 1 }} Minggu
+                                                @elseif ($loan->sisa_durasi_pinjaman == 0)
                                                     <label for="" class="badge bg-success">Lunas</label>
                                                 @else
                                                     {{ $loan->sisa_durasi_pinjaman }} Minggu

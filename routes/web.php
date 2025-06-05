@@ -17,6 +17,7 @@ use App\Http\Controllers\supervisor\SupervisorController;
 use App\Http\Controllers\user\BorrowerProfileController;
 use App\Http\Controllers\user\LoanApplicationController;
 use App\Http\Controllers\user\LoanPaymentController;
+use App\Http\Controllers\user\PasswordController;
 use App\Http\Controllers\user\SavingController;
 use App\Http\Controllers\user\UserController;
 use App\Http\Controllers\user\ViewSavingController;
@@ -55,11 +56,15 @@ Route::middleware(['auth', 'role.admin'])->group(function () {
 
 Route::middleware(['auth', 'role.user'])->group(function () {
     Route::get('/home', [UserController::class, 'index'])->name('home');
-
     Route::resource('borrower-profiles', BorrowerProfileController::class);
-    Route::resource('loan-applications', LoanApplicationController::class)->except('show');
-    Route::get('/loan-applications/print', [LoanApplicationController::class, 'printActiveLoans'])->name('loan-applications.print');
-    Route::resource('my-savings', ViewSavingController::class);
+    Route::get('/user/change-password', [PasswordController::class, 'edit'])->name('user.password.edit');
+    Route::post('/user/change-password', [PasswordController::class, 'update'])->name('user.password.update');
+
+    Route::middleware('borrower.verified')->group(function () {
+        Route::resource('loan-applications', LoanApplicationController::class)->except('show');
+        Route::get('/loan-applications/print', [LoanApplicationController::class, 'printActiveLoans'])->name('loan-applications.print');
+        Route::resource('my-savings', ViewSavingController::class);
+    });
 });
 
 Route::middleware(['auth', 'role.petugas'])->group(function () {

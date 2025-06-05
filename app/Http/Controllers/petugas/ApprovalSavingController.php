@@ -17,6 +17,8 @@ class ApprovalSavingController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+            // dd($savings);
+
         return view('petugas.approval-savings.index', compact('savings'));
     }
 

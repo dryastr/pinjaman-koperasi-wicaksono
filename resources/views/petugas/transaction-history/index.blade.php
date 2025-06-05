@@ -35,11 +35,20 @@
                                                 @if ($transaction instanceof \App\Models\LoanPayment)
                                                     Pembayaran Pinjaman
                                                 @else
-                                                    Tabungan ({{ ucfirst($transaction->type) }})
+                                                    @if (is_null($transaction->type))
+                                                        Tabungan (Wajib dan Sukarela)
+                                                    @else
+                                                        Tabungan ({{ ucfirst($transaction->type) }})
+                                                    @endif
                                                 @endif
                                             </td>
-                                            <td>Rp
-                                                {{ number_format($transaction instanceof \App\Models\LoanPayment ? $transaction->jumlah_dibayar : $transaction->amount, 0, ',', '.') }}
+                                            <td>
+                                                @if($transaction->amount == 0)
+                                                    Wajib: Rp {{ number_format($transaction->wajib_amount, 0, ',', '.') }}<br>
+                                                    Sukarela: Rp {{ number_format($transaction->sukarela_amount, 0, ',', '.') }}
+                                                @else
+                                                    Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                                @endif
                                             </td>
                                             <td>
                                                 @if ($transaction instanceof \App\Models\LoanPayment)

@@ -9,12 +9,29 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-title">Menunggu Approval</h6>
+                            <h6 class="card-title">Menunggu Approval Anggota</h6>
                             <h2 class="mb-0">{{ $pendingCount }}</h2>
                             <small>Anggota Baru</small>
                         </div>
                         <div class="icon">
                             <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Menunggu Approval Pinjaman</h6>
+                            <h2 class="mb-0">{{ $pendingLoanCount }}</h2>
+                            <small>Pengajuan Pinjaman</small>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-cash fs-1"></i>
                         </div>
                     </div>
                 </div>
@@ -60,14 +77,13 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title">Aktivitas Approval 7 Hari Terakhir</h5>
+                    <h5 class="card-title">Aktivitas Approval Anggota 7 Hari Terakhir</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="approvalChart" height="150"></canvas>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="row" id="pendingUsers">
@@ -80,7 +96,7 @@
                     <div class="card-body">
                         @if ($pendingUsers->isEmpty())
                             <div class="alert alert-info">
-                                Tidak ada anggota baru yang perlu disetujui
+                                Tidak ada anggota baru yang perlu disetujui.
                             </div>
                         @else
                             <div class="table-responsive">

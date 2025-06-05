@@ -71,5 +71,6 @@ class Kernel extends HttpKernel
         'role.supervisor' => \App\Http\Middleware\CheckRoleSupervisor::class,
         'role.petugas' => \App\Http\Middleware\CheckRolePetugas::class,
         'redirectIfAuthenticated' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'borrower.verified' => \App\Http\Middleware\CheckBorrowerProfile::class,
     ];
 }

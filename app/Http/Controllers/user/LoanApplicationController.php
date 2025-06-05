@@ -15,35 +15,56 @@ class LoanApplicationController extends Controller
      */
     public function index()
     {
-        $loans = LoanApplication::with('user')
+        $loans = LoanApplication::with(['user', 'payments'])
             ->where('user_id', auth()->id())
             ->get();
 
         $warnings = [];
+        $today = Carbon::now();
 
         foreach ($loans as $loan) {
-            $payments = LoanPayment::where('loan_application_id', $loan->id)
-                ->orderBy('tanggal_pembayaran', 'desc')
-                ->pluck('tanggal_pembayaran');
+            if ($loan->status !== 'accepted') {
+                continue;
+            }
 
-            $now = Carbon::now();
-            $missingWeeks = 0;
+            $payments = $loan->payments->sortByDesc('tanggal_pembayaran');
+            $loanDate = Carbon::parse($loan->created_at);
 
-            for ($i = 0; $i < 3; $i++) {
-                $startOfWeek = $now->copy()->subWeeks($i)->startOfWeek();
-                $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
+            if ($payments->isEmpty()) {
+                if ($loanDate->diffInWeeks($today) >= 3) {
+                    $warnings[] = "Pinjaman ID #{$loan->id} - Belum membayar sama sekali selama 3 minggu!";
+                }
+                continue;
+            }
 
-                $paidThisWeek = $payments->contains(function ($paymentDate) use ($startOfWeek, $endOfWeek) {
-                    return Carbon::parse($paymentDate)->between($startOfWeek, $endOfWeek);
+            $lastPaymentDate = Carbon::parse($payments->first()->tanggal_pembayaran);
+
+            $allWeeksMissing = true;
+
+            for ($i = 1; $i <= 3; $i++) {
+                $weekToCheck = $lastPaymentDate->copy()->addWeeks($i);
+
+                if ($weekToCheck->isFuture()) {
+                    $allWeeksMissing = false;
+                    break;
+                }
+                
+                $paymentInWeek = $payments->contains(function ($payment) use ($weekToCheck) {
+                    return Carbon::parse($payment->tanggal_pembayaran)
+                        ->between(
+                            $weekToCheck->copy()->startOfWeek(),
+                            $weekToCheck->copy()->endOfWeek()
+                        );
                 });
 
-                if (!$paidThisWeek) {
-                    $missingWeeks++;
+                if ($paymentInWeek) {
+                    $allWeeksMissing = false;
+                    break;
                 }
             }
 
-            if ($missingWeeks === 3) {
-                $warnings[] = "Pinjaman ID #{$loan->id} | {$loan->jenis_pinjaman} - Anda belum dibayar selama 3 minggu berturut-turut!";
+            if ($allWeeksMissing) {
+                $warnings[] = "Pinjaman ID #{$loan->id} - Tidak ada pembayaran selama 3 minggu berturut-turut!";
             }
         }
 

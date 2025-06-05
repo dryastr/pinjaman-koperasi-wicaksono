@@ -9,11 +9,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-title">Total Pengguna</h6>
-                            <h2 class="mb-0">{{ $totalUsers }}</h2>
+                            <h6 class="card-title">Total Iuran</h6>
+                            <h2 class="mb-0 text-white">Rp {{ number_format($iuran, 0, ',', '.') }}</h2>
                         </div>
                         <div class="icon">
-                            <i class="bi bi-people-fill fs-1"></i>
+                            <i class="bi bi-cash-coin fs-1"></i>
                         </div>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title">Pengguna Aktif</h6>
-                            <h2 class="mb-0">{{ $activeUsers }}</h2>
+                            <h2 class="mb-0 text-white">{{ $activeUsers }}</h2>
                         </div>
                         <div class="icon">
                             <i class="bi bi-person-check-fill fs-1"></i>
@@ -41,8 +41,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-title">Total Pinjaman</h6>
-                            <h2 class="mb-0">{{ $totalLoans }}</h2>
+                            <h6 class="card-title">Nominal Pinjaman</h6>
+                            <h2 class="mb-0 text-white">Rp {{ number_format($totalAmountLoans, 0, ',', '.') }}</h2>
                         </div>
                         <div class="icon">
                             <i class="bi bi-cash-coin fs-1"></i>
@@ -88,34 +88,34 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title">Statistik Tabungan</h5>
+                    <h5 class="card-title">Statistik Nominal Simpanan</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card bg-secondary text-white mb-3">
                                 <div class="card-body">
-                                    <h6 class="card-title">Pokok</h6>
-                                    <h3 class="mb-0">{{ $pokokSavings }}</h3>
-                                    <small>Pengguna</small>
+                                    <h6 class="card-title">Total 'Amount'</h6>
+                                    <h3 class="mb-0">Rp {{ number_format($totalAmountSavings, 0, ',', '.') }}</h3>
+                                    <small>Dari Kolom Amount</small>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card bg-primary text-white mb-3">
                                 <div class="card-body">
-                                    <h6 class="card-title">Wajib</h6>
-                                    <h3 class="mb-0">{{ $wajibSavings }}</h3>
-                                    <small>Pengguna</small>
+                                    <h6 class="card-title">Total 'Wajib'</h6>
+                                    <h3 class="mb-0">Rp {{ number_format($totalWajibAmountSavings, 0, ',', '.') }}</h3>
+                                    <small>Dari Kolom Wajib Amount</small>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card bg-success text-white mb-3">
                                 <div class="card-body">
-                                    <h6 class="card-title">Sukarela</h6>
-                                    <h3 class="mb-0">{{ $sukarelaSavings }}</h3>
-                                    <small>Pengguna</small>
+                                    <h6 class="card-title">Total 'Sukarela'</h6>
+                                    <h3 class="mb-0">Rp {{ number_format($totalSukarelaAmountSavings, 0, ',', '.') }}</h3>
+                                    <small>Dari Kolom Sukarela Amount</small>
                                 </div>
                             </div>
                         </div>
@@ -158,13 +158,17 @@
         const savingChart = new Chart(savingCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Pokok', 'Wajib', 'Sukarela'],
+                // Label untuk chart disesuaikan dengan nama kolom
+                labels: ['Total Amount', 'Total Wajib Amount', 'Total Sukarela Amount'],
                 datasets: [{
-                    data: [{{ $savingChartData['pokok'] }}, {{ $savingChartData['wajib'] }},
-                        {{ $savingChartData['sukarela'] }}
+                    // Data untuk chart diambil dari variabel baru
+                    data: [
+                        {{ $savingChartData['amount'] }},
+                        {{ $savingChartData['wajib_amount'] }},
+                        {{ $savingChartData['sukarela_amount'] }}
                     ],
                     backgroundColor: [
-                        'rgba(108, 117, 125, 0.8)',
+                        'rgba(108, 117, 125, 0.8)', // Warna bisa disesuaikan
                         'rgba(13, 110, 253, 0.8)',
                         'rgba(25, 135, 84, 0.8)'
                     ],

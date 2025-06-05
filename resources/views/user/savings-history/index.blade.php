@@ -23,7 +23,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($savings as $saving)
+                                    @foreach ($savings as $saving)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>Rp {{ number_format($saving->amount, 0, ',', '.') }}</td>
@@ -41,11 +41,7 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">Belum ada data simpanan</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

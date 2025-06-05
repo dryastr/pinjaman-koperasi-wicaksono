@@ -7,6 +7,7 @@ use App\Models\LoanApplication;
 use App\Models\LoanPayment;
 use App\Models\Saving;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -16,7 +17,7 @@ class UserController extends Controller
 
         $totalSavings = Saving::where('user_id', $user->id)
             ->where('status', 'approved')
-            ->sum('amount');
+            ->sum(DB::raw('amount + wajib_amount + sukarela_amount'));
 
         $savingCount = Saving::where('user_id', $user->id)
             ->where('status', 'approved')
@@ -32,6 +33,8 @@ class UserController extends Controller
         $totalPaid = $activeLoan ?
             LoanPayment::where('loan_application_id', $activeLoan->id)
             ->sum('jumlah_dibayar') : 0;
+
+        // dd($totalSavings);
 
         return view('user.dashboard', compact(
             'totalSavings',

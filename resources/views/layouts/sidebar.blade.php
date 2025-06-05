@@ -65,7 +65,7 @@
                         </li>
                     </ul>
                 </li>
-                @if (auth()->user()->borrowerProfile)
+                @if (auth()->user()->borrowerProfile && auth()->user()->borrowerProfile->status !== 'pending')
                     <li class="sidebar-item has-sub {{ Request::is('loan-applications*') ? 'active' : '' }}">
                         <a href="#" class='sidebar-link'>
                             <i class="bi bi-card-checklist"></i>
@@ -92,6 +92,18 @@
                         </ul>
                     </li>
                 @endif
+                <li class="sidebar-item has-sub {{ Request::is('user.password.edit*') ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-card-checklist"></i>
+                        <span>Ubah Password</span>
+                    </a>
+
+                    <ul class="submenu">
+                        <li class="submenu-item {{ Request::routeIs('user.password.edit') ? 'active' : '' }}">
+                            <a href="{{ route('user.password.edit') }}" class="submenu-link">Lihat</a>
+                        </li>
+                    </ul>
+                </li>
             @endif
 
             @if (auth()->user()->role->name == 'supervisor')

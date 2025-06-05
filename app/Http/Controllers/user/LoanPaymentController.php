@@ -7,6 +7,7 @@ use App\Models\LoanApplication;
 use App\Models\LoanPayment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -14,9 +15,16 @@ use Illuminate\Validation\ValidationException;
 class LoanPaymentController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $payments = LoanPayment::with(['loanApplication', 'user'])
+        $petugasId = Auth::id();
+        // $petugasId = $request->input('petugas_id');
+
+        $payments = LoanPayment::with(['user'])
+            ->whereHas('loanApplication', function ($query) use ($petugasId) {
+                $query->where('status', 'accepted')
+                    ->where('petugas_id', $petugasId);
+            })
             ->orderBy('tanggal_pembayaran', 'desc')
             ->get();
 
@@ -84,8 +92,8 @@ class LoanPaymentController extends Controller
     }
 
 
-        // return redirect()->route('loan-payments.index')
-        //     ->with('success', 'Pembayaran berhasil disimpan dan sisa durasi pinjaman telah diperbarui.');
+    // return redirect()->route('loan-payments.index')
+    //     ->with('success', 'Pembayaran berhasil disimpan dan sisa durasi pinjaman telah diperbarui.');
     // }
 
     public function update(Request $request, $id)
@@ -146,7 +154,10 @@ class LoanPaymentController extends Controller
 
     public function getUserLoans($userId)
     {
+        $petugasId = Auth::id();
+
         $loans = LoanApplication::where('user_id', $userId)
+            ->where('petugas_id', $petugasId) 
             ->where('sisa_durasi_pinjaman', '>', 0)
             ->get();
 

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\user;
 
 use App\Http\Controllers\Controller;
 use App\Models\BorrowerProfile;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class BorrowerProfileController extends Controller
 {
@@ -41,12 +44,27 @@ class BorrowerProfileController extends Controller
             'tabungan_pokok' => 'required|numeric|min:0',
         ]);
 
-        $fotoKtpPath = $request->file('foto_ktp')->store('public/borrower_profiles');
-        $fotoKkPath = $request->file('foto_kk')->store('public/borrower_profiles');
-        $fotoDiriPath = $request->file('foto_diri')->store('public/borrower_profiles');
+        $user = User::findOrFail($request->user_id);
+        $userId = $user->id;
+        $username = Str::slug($user->name);
+
+        $fotoKtp = $request->file('foto_ktp');
+        $ktpExt = $fotoKtp->getClientOriginalExtension();
+        $ktpFileName = "{$username}_ktp_{$userId}.{$ktpExt}";
+        $fotoKtpPath = $fotoKtp->storeAs('public/borrower_profiles', $ktpFileName);
+
+        $fotoKk = $request->file('foto_kk');
+        $kkExt = $fotoKk->getClientOriginalExtension();
+        $kkFileName = "{$username}_kk_{$userId}.{$kkExt}";
+        $fotoKkPath = $fotoKk->storeAs('public/borrower_profiles', $kkFileName);
+
+        $fotoDiri = $request->file('foto_diri');
+        $diriExt = $fotoDiri->getClientOriginalExtension();
+        $diriFileName = "{$username}_fotodiri_{$userId}.{$diriExt}";
+        $fotoDiriPath = $fotoDiri->storeAs('public/borrower_profiles', $diriFileName);
 
         BorrowerProfile::create([
-            'user_id' => $request->user_id,
+            'user_id' => $userId,
             'alamat' => $request->alamat,
             'tanggal_lahir' => $request->tanggal_lahir,
             'tempat_lahir' => $request->tempat_lahir,
@@ -60,6 +78,7 @@ class BorrowerProfileController extends Controller
 
         return redirect()->route('borrower-profiles.index')->with('success', 'Profil peminjam berhasil ditambahkan.');
     }
+
 
     /**
      * Update the specified resource in storage.
